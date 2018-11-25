@@ -1,0 +1,64 @@
+#ifndef PLANE_H
+#define PLANE_H
+
+#include <learnopengl/model.h>
+
+class Plane {
+public:;
+    Plane() {
+        plane = new Model(FileSystem::getPath("resources/objects/airplane/airplane.obj"));
+        aspect = 0.02;;
+        moveSpeed = 2.0;
+        turnSpeed = 8.0;
+        resizeSpeed = 4.0;
+    }
+
+    void Draw(Shader shader) {
+        glm::mat4 renderMat = glm::scale(planeMat, glm::vec3(aspect));
+        // Normalize plane angle
+        renderMat = glm::rotate(renderMat, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+        renderMat = glm::rotate(renderMat, glm::radians(15.0f), glm::vec3(0.0, 0.0, 1.0));
+        renderMat = glm::rotate(renderMat, glm::radians(90.0f), glm::vec3(-1.0, 0.0, 0.0));
+        // Turn movement animations
+        renderMat = glm::translate(renderMat, glm::vec3(angle/90, 0.0, angle/22.5));
+        renderMat = glm::rotate(renderMat, glm::radians(angle), glm::vec3(-1.0, 0.0, 0.0));
+        renderMat = glm::rotate(renderMat, glm::radians(angle/6), glm::vec3(0.0, 0.0, 1.0));
+
+        shader.setMat4("model", renderMat);
+        plane->Draw(shader);
+    }
+
+    void move(glm::vec3 movement) {
+            planeMat = glm::translate(planeMat, moveSpeed * movement);
+    }
+
+    void turn(float degrees) {
+        if(angle < 90.0f)
+            angle = glm::min(angle + degrees * turnSpeed, 90.0f);
+    }
+
+    void unturn(float degrees) {
+        if(angle > 0.0f)
+            angle = glm::max(angle - degrees * turnSpeed, 0.0f);
+    }
+
+    void shrink(float dec) {
+        if(aspect > 0.01)
+            aspect = glm::max(aspect - dec * resizeSpeed, 0.01f);
+    }
+
+    void deShrink(float dec) {
+        if(aspect < 0.02)
+            aspect = glm::min(aspect + dec * resizeSpeed, 0.02f);
+    }
+
+private:
+    Model *plane;
+    glm::mat4 planeMat;
+    float aspect;
+    float moveSpeed;
+    float turnSpeed;
+    float resizeSpeed;
+    float angle = 0.0;
+};
+#endif

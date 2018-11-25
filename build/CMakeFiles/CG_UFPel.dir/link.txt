@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=c++11 -g -Wall   CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o  -o bin/CG_UFPel  -L/home/arthur/Cadeiras/CG/Air-Dodger/lib -rdynamic -lglfw -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -ldl -lpthread -lassimp libSTB_IMAGE.a libGLAD.a -Wl,-rpath,/home/arthur/Cadeiras/CG/Air-Dodger/lib  -ldl

@@ -1,0 +1,5 @@
+/home/arthur/Cadeiras/CG/Air-Dodger/build/CMakeFiles/edit_cache.dir
+/home/arthur/Cadeiras/CG/Air-Dodger/build/CMakeFiles/CG_UFPel.dir
+/home/arthur/Cadeiras/CG/Air-Dodger/build/CMakeFiles/GLAD.dir
+/home/arthur/Cadeiras/CG/Air-Dodger/build/CMakeFiles/STB_IMAGE.dir
+/home/arthur/Cadeiras/CG/Air-Dodger/build/CMakeFiles/rebuild_cache.dir
