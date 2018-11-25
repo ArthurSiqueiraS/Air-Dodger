@@ -1,7 +1,4 @@
 #include <models.h>
-#include <irrklang/irrKlang.h>
-
-irrklang::ISoundEngine *SoundEngine = irrklang::createIrrKlangDevice();
 
 GLFWwindow* window;
 // camera
@@ -23,6 +20,9 @@ bool RIGHTpress = false;
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
+    int count;
+    const unsigned char *axes = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
@@ -36,16 +36,16 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(RIGHT, deltaTime);
 
     // Plane controls
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || axes[0] == GLFW_PRESS)
         plane->move(glm::vec3(0.0, deltaTime, 0.0));
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        plane->move(glm::vec3(0.0, -deltaTime, 0.0));
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        plane->move(glm::vec3(-deltaTime, 0.0, 0.0));
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || axes[1] == GLFW_PRESS)
         plane->move(glm::vec3(deltaTime, 0.0, 0.0));
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || axes[2] == GLFW_PRESS)
+        plane->move(glm::vec3(0.0, -deltaTime, 0.0));
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || axes[3] == GLFW_PRESS)
+        plane->move(glm::vec3(-deltaTime, 0.0, 0.0));
 
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || axes[4] == GLFW_PRESS)
         plane->turn(deltaTime * 90.0f);
     else
         plane->unturn(deltaTime * 90.0f);
@@ -76,12 +76,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
     glViewport(0, 0, width, height);
 }
 

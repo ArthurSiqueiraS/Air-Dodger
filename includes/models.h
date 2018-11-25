@@ -1,8 +1,8 @@
 #include <plane.h>
 
 // settings
-#define SCR_WIDTH 1920
-#define SCR_HEIGHT 640
+#define SCR_WIDTH 1280
+#define SCR_HEIGHT 500
 
 Plane *plane;
 Shader *shader;
@@ -10,7 +10,7 @@ Shader *shader;
 void loadModels() {
 	// build and compile shaders
     // -------------------------
-    plane = new Plane();
+    plane = new Plane(SCR_WIDTH, SCR_HEIGHT);
     shader = new Shader(FileSystem::getPath("resources/blinn-phong.vs").c_str(), FileSystem::getPath("resources/blinn-phong.fs").c_str());
 
 }

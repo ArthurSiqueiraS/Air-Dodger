@@ -122,27 +122,6 @@ CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o
  ../includes/glm/vec4.hpp
  ../includes/glm/vector_relational.hpp
  ../includes/helpers.h
- ../includes/irrklang/ik_ESoundEngineOptions.h
- ../includes/irrklang/ik_ESoundOutputDrivers.h
- ../includes/irrklang/ik_EStreamModes.h
- ../includes/irrklang/ik_IAudioRecorder.h
- ../includes/irrklang/ik_IAudioStream.h
- ../includes/irrklang/ik_IAudioStreamLoader.h
- ../includes/irrklang/ik_IFileFactory.h
- ../includes/irrklang/ik_IFileReader.h
- ../includes/irrklang/ik_IRefCounted.h
- ../includes/irrklang/ik_ISound.h
- ../includes/irrklang/ik_ISoundDeviceList.h
- ../includes/irrklang/ik_ISoundEffectControl.h
- ../includes/irrklang/ik_ISoundEngine.h
- ../includes/irrklang/ik_ISoundMixedOutputReceiver.h
- ../includes/irrklang/ik_ISoundSource.h
- ../includes/irrklang/ik_ISoundStopEventReceiver.h
- ../includes/irrklang/ik_IVirtualRefCounted.h
- ../includes/irrklang/ik_SAudioStreamFormat.h
- ../includes/irrklang/ik_irrKlangTypes.h
- ../includes/irrklang/ik_vec3d.h
- ../includes/irrklang/irrKlang.h
  ../includes/learnopengl/camera.h
  ../includes/learnopengl/filesystem.h
  ../includes/learnopengl/mesh.h

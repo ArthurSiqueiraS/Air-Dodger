@@ -12,7 +12,6 @@
 #include <learnopengl/model.h>
 
 #include <iostream>
-
 // Custom libs
 #include <glSetup.h>
 

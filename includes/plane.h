@@ -5,8 +5,10 @@
 
 class Plane {
 public:;
-    Plane() {
+    Plane(int SCR_WIDTH, int SCR_HEIGHT ) {
         plane = new Model(FileSystem::getPath("resources/objects/airplane/airplane.obj"));
+        vLimit = 1.0;
+        hLimit = SCR_WIDTH/SCR_HEIGHT;
         aspect = 0.02;;
         moveSpeed = 2.0;
         turnSpeed = 8.0;
@@ -29,7 +31,15 @@ public:;
     }
 
     void move(glm::vec3 movement) {
-            planeMat = glm::translate(planeMat, moveSpeed * movement);
+        planeMat = glm::translate(planeMat, moveSpeed * movement);
+        if(planeMat[3][0] < -hLimit)
+            planeMat[3][0] = -hLimit;
+        if(planeMat[3][0] > hLimit)
+            planeMat[3][0] = hLimit;
+        if(planeMat[3][1] < -vLimit)
+            planeMat[3][1] = -vLimit;
+        if(planeMat[3][1] > vLimit)
+            planeMat[3][1] = vLimit;
     }
 
     void turn(float degrees) {
@@ -55,6 +65,8 @@ public:;
 private:
     Model *plane;
     glm::mat4 planeMat;
+    float vLimit;
+    float hLimit;
     float aspect;
     float moveSpeed;
     float turnSpeed;

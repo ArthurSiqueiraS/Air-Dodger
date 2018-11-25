@@ -63,8 +63,8 @@ CMAKE_BINARY_DIR = /home/arthur/Cadeiras/CG/Air-Dodger/build
 # Target rules for target CMakeFiles/CG_UFPel.dir
 
 # All Build rule for target.
-CMakeFiles/CG_UFPel.dir/all: CMakeFiles/STB_IMAGE.dir/all
 CMakeFiles/CG_UFPel.dir/all: CMakeFiles/GLAD.dir/all
+CMakeFiles/CG_UFPel.dir/all: CMakeFiles/STB_IMAGE.dir/all
 	$(MAKE) -f CMakeFiles/CG_UFPel.dir/build.make CMakeFiles/CG_UFPel.dir/depend
 	$(MAKE) -f CMakeFiles/CG_UFPel.dir/build.make CMakeFiles/CG_UFPel.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arthur/Cadeiras/CG/Air-Dodger/build/CMakeFiles --progress-num=1,2 "Built target CG_UFPel"
