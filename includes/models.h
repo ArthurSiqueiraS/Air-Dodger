@@ -1,8 +1,8 @@
 #include <plane.h>
 
 // settings
-#define SCR_WIDTH 1280
-#define SCR_HEIGHT 500
+#define SCR_WIDTH 1920
+#define SCR_HEIGHT 1080
 
 Plane *plane;
 Shader *shader;

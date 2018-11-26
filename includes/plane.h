@@ -7,12 +7,15 @@ class Plane {
 public:;
     Plane(int SCR_WIDTH, int SCR_HEIGHT ) {
         plane = new Model(FileSystem::getPath("resources/objects/airplane/airplane.obj"));
-        vLimit = 1.0;
-        hLimit = SCR_WIDTH/SCR_HEIGHT;
-        aspect = 0.02;;
+        vLimit = 0.90;
+        hLimit = SCR_WIDTH/SCR_HEIGHT - 0.1;
         moveSpeed = 2.0;
         turnSpeed = 8.0;
         resizeSpeed = 4.0;
+        angle = 0.0;
+        size = 0.015;
+        shrinkSize = 0.007;
+        aspect = size;
     }
 
     void Draw(Shader shader) {
@@ -53,13 +56,13 @@ public:;
     }
 
     void shrink(float dec) {
-        if(aspect > 0.01)
-            aspect = glm::max(aspect - dec * resizeSpeed, 0.01f);
+        if(aspect > shrinkSize)
+            aspect = glm::max(aspect - dec * resizeSpeed, shrinkSize);
     }
 
     void deShrink(float dec) {
-        if(aspect < 0.02)
-            aspect = glm::min(aspect + dec * resizeSpeed, 0.02f);
+        if(aspect < size)
+            aspect = glm::min(aspect + dec * resizeSpeed, size);
     }
 
 private:
@@ -71,6 +74,8 @@ private:
     float moveSpeed;
     float turnSpeed;
     float resizeSpeed;
-    float angle = 0.0;
+    float angle;
+    float size;
+    float shrinkSize;
 };
 #endif
