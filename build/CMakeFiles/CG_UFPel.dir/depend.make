@@ -31,7 +31,7 @@ CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/assimp/vector2.h
 CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/assimp/vector2.inl
 CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/assimp/vector3.h
 CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/assimp/vector3.inl
-CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/boundedTransform.h
+CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/boundedModel.h
 CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/glSetup.h
 CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/glad/glad.h
 CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o: ../includes/glm/common.hpp

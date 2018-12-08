@@ -32,7 +32,7 @@ CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o
  ../includes/assimp/vector2.inl
  ../includes/assimp/vector3.h
  ../includes/assimp/vector3.inl
- ../includes/boundedTransform.h
+ ../includes/boundedModel.h
  ../includes/glSetup.h
  ../includes/glad/glad.h
  ../includes/glm/common.hpp

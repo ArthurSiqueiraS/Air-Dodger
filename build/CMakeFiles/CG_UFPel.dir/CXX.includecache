@@ -268,7 +268,7 @@ vector3.h
 cmath
 -
 
-../includes/boundedTransform.h
+../includes/boundedModel.h
 
 ../includes/glSetup.h
 window.h
@@ -1107,17 +1107,15 @@ obstacles.h
 -
 
 ../includes/obstacles.h
-learnopengl/model.h
+boundedModel.h
 -
 helpers.h
 -
 queue
 -
-boundedTransform.h
--
 
 ../includes/plane.h
-learnopengl/model.h
+boundedModel.h
 -
 
 ../includes/stb_image.h

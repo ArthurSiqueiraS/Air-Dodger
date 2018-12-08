@@ -2,8 +2,8 @@
 #include <obstacles.h>
 
 // settings
-#define SCR_WIDTH 1920
-#define SCR_HEIGHT 600
+#define SCR_WIDTH 1500
+#define SCR_HEIGHT 700
 
 Plane *plane;
 Shader *shader;
@@ -14,7 +14,7 @@ Model *cube, *openCube;
 void loadModels() {
 	// build and compile shaders
     // -------------------------
-    plane = new Plane(SCR_WIDTH, SCR_HEIGHT);
+    plane = new Plane();
     shader = new Shader(FileSystem::getPath("resources/blinn-phong.vs").c_str(), FileSystem::getPath("resources/blinn-phong.fs").c_str());
     cube = new Model(FileSystem::getPath("resources/objects/cube/cube.obj").c_str());
     openCube = new Model(FileSystem::getPath("resources/objects/cube/openCube.obj").c_str());

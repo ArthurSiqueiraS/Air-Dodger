@@ -1,7 +1,6 @@
-#include <learnopengl/model.h>
+#include <boundedModel.h>
 #include <helpers.h>
 #include <queue>
-#include <boundedTransform.h>
 
 class Obstacle {
 protected:
@@ -29,10 +28,6 @@ public:
         obstacle->Draw(shader);
     }
 
-    void transformBoundingBox(glm::vec3 transform) {
-        
-    }
-
     void queueWave(Shader shader) {
         glBindTexture(GL_TEXTURE_2D, texture);
         glm::mat4 renderMat = modelMat;
@@ -57,8 +52,9 @@ public:
     Fence(Model *fence, const char *pathToTexture) : Obstacle(fence, pathToTexture, 8, -4.5, 3.5) {
         modelMat = glm::translate(modelMat, glm::vec3(1.0, 0.0, 0.0));
         modelMat = glm::rotate(modelMat, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        modelMat = glm::scale(modelMat, glm::vec3(0.04f, 0.25f, 0.25f));
-        // printf("%f %f\n", obstacle->boundingBox[0], obstacle->boundingBox[1]);
+        // printf("%f %f\n", obstacle->boundingBox[0].x, obstacle->boundingBox[1].x);
+        modelMat = scale(obstacle, modelMat, glm::vec3(0.04f, 0.25f, 0.25f));
+        // printf("%f %f\n", obstacle->boundingBox[0].x, obstacle->boundingBox[1].x);
     }
 
     virtual void Draw(Shader shader) {
@@ -67,6 +63,5 @@ public:
         modelMat = glm::translate(modelMat, glm::vec3(-3.5, 0.0, 0.0));
         Obstacle::Draw(shader);
         modelMat = backMat;
-        // printf("%f %f\n", obstacle->boundingBox[0], obstacle->boundingBox[1]);
     }
 };

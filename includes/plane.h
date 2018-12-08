@@ -1,4 +1,4 @@
-#include <learnopengl/model.h>
+#include <boundedModel.h>
 
 class Plane {
 private:
@@ -15,13 +15,13 @@ private:
     float shrinkSize;
 
 public:
-    Plane(int SCR_WIDTH, int SCR_HEIGHT ) {
+    Plane() {
         plane = new Model(FileSystem::getPath("resources/objects/airplane/airplane.obj"));
         // Ortho limits
         // vLimit = 0.90;
         // hLimit = SCR_WIDTH/SCR_HEIGHT - 0.1;
         vLimit = 1.1;
-        hLimit = 2;
+        hLimit = 2.4;
         moveSpeed = 2.0;
         turnSpeed = 8.0;
         resizeSpeed = 4.0;
@@ -32,7 +32,7 @@ public:
     }
 
     void Draw(Shader shader) {
-        glm::mat4 renderMat = glm::scale(planeMat, glm::vec3(aspect * 1.75, aspect, aspect));
+        glm::mat4 renderMat = scale(plane, planeMat, glm::vec3(aspect * 1.75, aspect, aspect));
         // Normalize plane angle
         renderMat = glm::rotate(renderMat, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
         renderMat = glm::rotate(renderMat, glm::radians(15.0f), glm::vec3(0.0, 0.0, 1.0));
