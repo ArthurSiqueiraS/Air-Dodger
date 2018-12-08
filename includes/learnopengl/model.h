@@ -31,6 +31,8 @@ public:
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
+    glm::vec3 boundingBox[8];
+    float boundingCoordinates[6];
 
     /*  Functions   */
     // constructor, expects a filepath to a 3D model.
@@ -86,6 +88,51 @@ private:
 
     }
 
+    void createBoundingCoordinates(glm::vec3 vertex) {
+        boundingCoordinates[0] = vertex.x;
+        boundingCoordinates[1] = vertex.x;
+        boundingCoordinates[2] = vertex.y;
+        boundingCoordinates[3] = vertex.y;
+        boundingCoordinates[4] = vertex.z;
+        boundingCoordinates[5] = vertex.z;
+    }
+
+    void updateBoundingCoordinates(Vertex vertex) {
+        float x = vertex.Position.x, y = vertex.Position.y, z = vertex.Position.z;
+        if(x < boundingCoordinates[0])
+            boundingCoordinates[0] = x;
+        if(x > boundingCoordinates[1])
+            boundingCoordinates[1] = x;
+        if(y < boundingCoordinates[2])
+            boundingCoordinates[2] = y;
+        if(y > boundingCoordinates[3])
+            boundingCoordinates[3] = y;
+        if(z < boundingCoordinates[4])
+            boundingCoordinates[4] = z;
+        if(z > boundingCoordinates[5])
+            boundingCoordinates[5] = z;
+    }
+
+    void createBoundingBox() {
+        glm::vec3 lowerLeftBack, lowerLeftFront, upperLeftBack, upperLeftFront, lowerRightBack, lowerRightFront, upperRightBack, upperRightFront;
+        float Xmin = boundingCoordinates[0], Xmax = boundingCoordinates[1],
+              Ymin = boundingCoordinates[2], Ymax = boundingCoordinates[3],
+              Zmin = boundingCoordinates[4], Zmax = boundingCoordinates[5];
+        lowerLeftBack = glm::vec3(Xmin, Ymin, Zmin);
+        lowerLeftFront = glm::vec3(Xmin, Ymin, Zmax);
+        upperLeftBack = glm::vec3(Xmin, Ymax, Zmin);
+        upperLeftFront = glm::vec3(Xmin, Ymax, Zmax);
+        lowerRightBack = glm::vec3(Xmax, Ymin, Zmin);
+        lowerRightFront = glm::vec3(Xmax, Ymin, Zmax);
+        upperRightBack = glm::vec3(Xmax, Ymax, Zmin);
+        upperRightFront = glm::vec3(Xmax, Ymax, Zmax);
+
+        boundingBox[0] = lowerLeftBack; boundingBox[1] = lowerLeftFront;
+        boundingBox[2] = upperLeftBack; boundingBox[3] = upperLeftFront;
+        boundingBox[4] = lowerRightBack; boundingBox[5] = lowerRightFront;
+        boundingBox[6] = upperRightBack; boundingBox[7] = upperRightFront;
+    }
+
     Mesh processMesh(aiMesh *mesh, const aiScene *scene)
     {
         // data to fill
@@ -93,6 +140,8 @@ private:
         vector<unsigned int> indices;
         vector<Texture> textures;
 
+        glm::vec3 vertice = glm::vec3(mesh->mVertices[0].x, mesh->mVertices[0].y, mesh->mVertices[0].z);
+        createBoundingCoordinates(vertice);
         // Walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
@@ -103,6 +152,7 @@ private:
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
             vertex.Position = vector;
+            updateBoundingCoordinates(vertex);
             // normals
             vector.x = mesh->mNormals[i].x;
             vector.y = mesh->mNormals[i].y;
@@ -132,6 +182,9 @@ private:
             vertex.Bitangent = vector;
             vertices.push_back(vertex);
         }
+
+        createBoundingBox();
+        
         // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
         for(unsigned int i = 0; i < mesh->mNumFaces; i++)
         {

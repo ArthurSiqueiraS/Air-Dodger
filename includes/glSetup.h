@@ -1,5 +1,4 @@
 #include <window.h>
-#include <helpers.h>
 
 int glSetup() {
     // glfw: initialize and configure

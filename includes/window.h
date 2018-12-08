@@ -21,8 +21,12 @@ bool RIGHTpress = false;
 void processInput(GLFWwindow *window)
 {
     int count;
-    const unsigned char *axes = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
-
+    const unsigned char *axes, off[5] = {0};
+    if (glfwJoystickPresent(GLFW_JOYSTICK_1))
+        axes = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+    else {
+        axes = off;
+    }
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
@@ -45,26 +49,36 @@ void processInput(GLFWwindow *window)
         plane->shrink(deltaTime * 0.01);
     else
         plane->deShrink(deltaTime * 0.01);
+
+    // Camera movement
+    // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(FORWARD, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(BACKWARD, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(LEFT, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
+    // if (firstMouse)
+    // {
+    //     lastX = xpos;
+    //     lastY = ypos;
+    //     firstMouse = false;
+    // }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    // float xoffset = xpos - lastX;
+    // float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-    lastX = xpos;
-    lastY = ypos;
+    // lastX = xpos;
+    // lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    // camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 // ---------------------------------------------------------------------------------------------

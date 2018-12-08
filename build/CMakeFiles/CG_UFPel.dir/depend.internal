@@ -32,6 +32,7 @@ CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o
  ../includes/assimp/vector2.inl
  ../includes/assimp/vector3.h
  ../includes/assimp/vector3.inl
+ ../includes/boundedTransform.h
  ../includes/glSetup.h
  ../includes/glad/glad.h
  ../includes/glm/common.hpp
@@ -128,6 +129,7 @@ CMakeFiles/CG_UFPel.dir/src/CG_UFPel/main.cpp.o
  ../includes/learnopengl/model.h
  ../includes/learnopengl/shader.h
  ../includes/models.h
+ ../includes/obstacles.h
  ../includes/plane.h
  ../includes/stb_image.h
  ../includes/window.h

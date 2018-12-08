@@ -268,10 +268,10 @@ vector3.h
 cmath
 -
 
+../includes/boundedTransform.h
+
 ../includes/glSetup.h
 window.h
--
-helpers.h
 -
 
 ../includes/glad/glad.h
@@ -1102,6 +1102,18 @@ iostream
 
 ../includes/models.h
 plane.h
+-
+obstacles.h
+-
+
+../includes/obstacles.h
+learnopengl/model.h
+-
+helpers.h
+-
+queue
+-
+boundedTransform.h
 -
 
 ../includes/plane.h

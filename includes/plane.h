@@ -1,25 +1,38 @@
-#ifndef PLANE_H
-#define PLANE_H
-
 #include <learnopengl/model.h>
 
 class Plane {
-public:;
+private:
+    Model *plane;
+    glm::mat4 planeMat;
+    float vLimit;
+    float hLimit;
+    float aspect;
+    float moveSpeed;
+    float turnSpeed;
+    float resizeSpeed;
+    float angle;
+    float size;
+    float shrinkSize;
+
+public:
     Plane(int SCR_WIDTH, int SCR_HEIGHT ) {
         plane = new Model(FileSystem::getPath("resources/objects/airplane/airplane.obj"));
-        vLimit = 0.90;
-        hLimit = SCR_WIDTH/SCR_HEIGHT - 0.1;
+        // Ortho limits
+        // vLimit = 0.90;
+        // hLimit = SCR_WIDTH/SCR_HEIGHT - 0.1;
+        vLimit = 1.1;
+        hLimit = 2;
         moveSpeed = 2.0;
         turnSpeed = 8.0;
         resizeSpeed = 4.0;
         angle = 0.0;
-        size = 0.015;
-        shrinkSize = 0.007;
+        size = 0.025;
+        shrinkSize = size/2;
         aspect = size;
     }
 
     void Draw(Shader shader) {
-        glm::mat4 renderMat = glm::scale(planeMat, glm::vec3(aspect));
+        glm::mat4 renderMat = glm::scale(planeMat, glm::vec3(aspect * 1.75, aspect, aspect));
         // Normalize plane angle
         renderMat = glm::rotate(renderMat, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
         renderMat = glm::rotate(renderMat, glm::radians(15.0f), glm::vec3(0.0, 0.0, 1.0));
@@ -64,18 +77,4 @@ public:;
         if(aspect < size)
             aspect = glm::min(aspect + dec * resizeSpeed, size);
     }
-
-private:
-    Model *plane;
-    glm::mat4 planeMat;
-    float vLimit;
-    float hLimit;
-    float aspect;
-    float moveSpeed;
-    float turnSpeed;
-    float resizeSpeed;
-    float angle;
-    float size;
-    float shrinkSize;
 };
-#endif
