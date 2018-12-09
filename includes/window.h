@@ -45,10 +45,10 @@ void processInput(GLFWwindow *window)
     else
         plane->unturn(deltaTime * 90.0f);
 
-    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-        plane->shrink(deltaTime * 0.01);
-    else
-        plane->deShrink(deltaTime * 0.01);
+    // if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+    //     plane->shrink(deltaTime * 0.01);
+    // else
+    //     plane->deShrink(deltaTime * 0.01);
 
     // Camera movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)

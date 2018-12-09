@@ -14,6 +14,7 @@ private:
     float angle;
     float size;
     float shrinkSize;
+    bool shrunk, turned;
     glm::vec3 scaleVec;
 
 public:
@@ -30,19 +31,14 @@ public:
         angle = 0.0;
         size = 0.025;
         shrinkSize = size/2;
+        shrunk = false;
+        turned = false;
         aspect = size;
         scaleVec = glm::vec3(aspect * 1.75, aspect, aspect);
 
         boundingBox = (glm::vec3 *) malloc(sizeof(glm::vec3) * 8);
         copyBoundingBox(boundingBox, plane->boundingBox);
         normalized = (glm::vec3 *) malloc(sizeof(glm::vec3) * 8);
-    }
-
-    void print() {
-        printf("Plane:\n");
-        printf("X: %f %f\n", normalized[0].x, normalized[7].x);
-        printf("Y: %f %f\n", normalized[0].y, normalized[7].y);
-        printf("Z: %f %f\n", normalized[0].z, normalized[7].z);
     }
 
     void Draw(Shader shader) {
@@ -67,15 +63,21 @@ public:
         translate(boundingBox, planeMat, transform/scaleVec);
     }
 
+    bool isTurned() {
+        return turned;
+    }
+
     void turn(float degrees) {
         if(angle < 90.0f) {
             angle = glm::min(angle + degrees * turnSpeed, 90.0f);
             float currentYmin = boundingBox[0].y, currentYmax = boundingBox[7].y,
                 currentZmin = boundingBox[0].z, currentZmax = boundingBox[7].z,
-                offset = degrees;
-            updateBoundingBoxY(boundingBox, currentYmin - offset, currentYmax + offset);
-            updateBoundingBoxZ(boundingBox, currentZmin + offset, currentZmax - offset);
+                bias = degrees/2;
+            updateBoundingBoxY(boundingBox, currentYmin - bias, currentYmax + bias);
+            updateBoundingBoxZ(boundingBox, currentZmin + bias, currentZmax - bias);
         }
+        else
+            turned = true;
     }
 
     void unturn(float degrees) {
@@ -83,21 +85,31 @@ public:
             angle = glm::max(angle - degrees * turnSpeed, 0.0f);
             float currentYmin = boundingBox[0].y, currentYmax = boundingBox[7].y,
                 currentZmin = boundingBox[0].z, currentZmax = boundingBox[7].z,
-                offset = degrees;
+                bias = degrees/2;
 
-            updateBoundingBoxY(boundingBox, currentYmin + offset, currentYmax - offset);
-            updateBoundingBoxZ(boundingBox, currentZmin - offset, currentZmax + offset);
+            updateBoundingBoxY(boundingBox, currentYmin + bias, currentYmax - bias);
+            updateBoundingBoxZ(boundingBox, currentZmin - bias, currentZmax + bias);
         }
+        else
+            turned = false;
+    }
+
+    bool isShrunk() {
+        return shrunk;
     }
 
     void shrink(float dec) {
         if(aspect > shrinkSize)
             aspect = glm::max(aspect - dec * resizeSpeed, shrinkSize);
+        else
+            shrunk = true;
     }
 
     void deShrink(float dec) {
         if(aspect < size)
             aspect = glm::min(aspect + dec * resizeSpeed, size);
+        else
+            shrunk = false;
     }
 
     glm::vec3 *getBoundingBox() {
@@ -112,18 +124,18 @@ private:
     }
 
     glm::mat4 normalizePlaneMat(glm::vec3 *boundingBox) {
-        scaleVec = glm::vec3(aspect * 1.75, aspect, aspect);
-        glm::mat4 renderMat = scale(boundingBox, planeMat, scaleVec);
+        glm::mat4 renderMat = rotate(planeMat, 180.0f, glm::vec3(0.0, 1.0, 0.0));
         // Normalize plane angle
-        renderMat = rotate(renderMat, 180.0f, glm::vec3(0.0, 1.0, 0.0));
         renderMat = rotate(renderMat, 15.0f, glm::vec3(0.0, 0.0, 1.0));
         renderMat = rotate(renderMat, 90.0f, glm::vec3(-1.0, 0.0, 0.0));
         // Turn movement animations
-        // print();
-        renderMat = translate(boundingBox, renderMat, glm::vec3(angle/90, 0.0, angle/22.5), scaleVec);
-        // print();
+        // renderMat = translate(boundingBox, renderMat, glm::vec3(angle/90, 0.0, angle/22.5), scaleVec);
+
         renderMat = rotate(renderMat, angle, glm::vec3(-1.0, 0.0, 0.0));
         renderMat = rotate(renderMat, angle/6, glm::vec3(0.0, 0.0, 1.0));
+        scale(boundingBox, renderMat, scaleVec);
+        renderMat = scale(renderMat, glm::vec3(aspect * 1.75, aspect, aspect));
+
         return renderMat;
     }
 

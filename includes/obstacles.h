@@ -15,7 +15,7 @@ protected:
     int maxPositions;
     float *validY;
     queue<Wave> waves;
-    float frequency, timer, collisionBias;
+    float frequency, timer, collisionBiasX, collisionBiasY;
     glm::vec3 aspect;
     glm::vec3 direction;
 
@@ -39,7 +39,7 @@ public:
         if(timer >= frequency) {
             if(waves.empty())
                 queueWave();
-            score = 150;
+            score = 1;
             timer = 0.0;
         }
 
@@ -49,11 +49,13 @@ public:
             waveCycle.push(waves.front());
             waves.pop();
             Wave wave = waveCycle.back();
-            for(int i = 0; i < maxPositions; ++i) {
-                glm::vec3 backUpBoundingBox[8];
+            for(int i = 0; i < maxPositions; i+=2) {
                 wave.mats[i] = glm::translate(wave.mats[i], direction * deltaTime);
                 Draw(shader, wave.mats[i]);
-                collision(wave.boundingBox, plane);
+                if(collision(wave.boundingBox, plane, wave.mats[i][3][1] - modelMat[3][1])) {
+                    printf("[%d] hit\n", i);
+                    score = handleCollision();
+                }
             }
             translate(wave.boundingBox, wave.mats[0], direction * deltaTime, aspect);
         }
@@ -70,6 +72,13 @@ public:
         return score;
     }
 
+protected:
+    void copyBoundingBox(glm::vec3 *copy, glm::vec3 *original) {
+        for(int i = 0; i < 8; ++i)
+            copy[i] = original[i];
+    }
+
+private:
     virtual void Draw(Shader shader, glm::mat4 model) = 0;
 
     void queueWave() {
@@ -79,52 +88,51 @@ public:
             frequency -= 0.1;
 
         Wave wave;
-        wave.mats = (glm::mat4 *) malloc(sizeof(glm::mat4) * maxPositions);
-
-        for(int i = 0; i < maxPositions; ++i)
-            wave.mats[i] = glm::translate(modelMat, glm::vec3(0.0, validY[i], 0.0));
-
         wave.boundingBox = (glm::vec3 *) malloc(sizeof(glm::vec3) * 8);
         copyBoundingBox(wave.boundingBox, obstacle->boundingBox);
+        wave.mats = (glm::mat4 *) malloc(sizeof(glm::mat4) * maxPositions);
+
+        for(int i = 0; i < maxPositions; ++i) {
+            wave.mats[i] = translate(wave.boundingBox, modelMat, glm::vec3(0.0, validY[i], 0.0));
+        }
 
         waves.push(wave);
     }
 
-    void copyBoundingBox(glm::vec3 *copy, glm::vec3 *original) {
-        for(int i = 0; i < 8; ++i)
-            copy[i] = original[i];
-    }
-
-    bool collision(glm::vec3 *boundingBox, Plane *plane) {
+    virtual bool collision(glm::vec3 *boundingBox, Plane *plane, float offsetY) {
         glm::vec3 planeBB[8];
         copyBoundingBox(planeBB, plane->getBoundingBox());
-        updateBoundingBoxX(planeBB, planeBB[0].x - collisionBias, planeBB[7].x + collisionBias);
+
+        float biasX = collisionBiasX, biasY = collisionBiasY;
+
+        if(plane->isShrunk()) {
+            biasX /= 2;
+            biasY /= 2;
+        }
+        updateBoundingBoxX(planeBB, planeBB[0].x - biasX, planeBB[7].x + biasX);
+        updateBoundingBoxY(planeBB, planeBB[0].y - biasY, planeBB[7].y + biasY);
 
         // if(obstacle->boundingBox[0].x > planeBB[7].x || obstacle->boundingBox[7].x < planeBB[0].x)
         //     return false;
         float obstXmin = boundingBox[0].x, obstXmax = boundingBox[7].x,
-              planeXmin = planeBB[0].x, planeXmax = planeBB[7].x;
+              obstYmin = boundingBox[0].y + offsetY - 0.075, obstYmax = boundingBox[7].y + offsetY - 0.075,
+              planeXmin = planeBB[0].x, planeXmax = planeBB[7].x,
+              planeYmin = planeBB[0].y, planeYmax = planeBB[7].y;
 
-        for(int i = 0; i < 8; ++i) {
-            float planeX = planeBB[i].x,
-                  obstX = boundingBox[i].x;
-            if(
-                (planeX >= obstXmin && planeX <= obstXmax) ||
-                (obstX >= planeXmin && obstX <= planeXmax)
-            ) {
-                printf("hit [%d]\n", i);
-                return true;
+            if(((planeXmin >= obstXmin && planeXmin <= obstXmax) || (planeXmax >= obstXmin && planeXmax <= obstXmax))
+            || ((obstXmin >= planeXmin && obstXmin <= planeXmax) || (obstXmax >= planeXmin && obstXmax <= planeXmax))) {
+                if(((planeYmin >= obstYmin && planeYmin <= obstYmax) || (planeYmax >= obstYmin && planeYmax <= obstYmax))
+                || ((obstYmin >= planeYmin && obstYmin <= planeYmax) || (obstYmax >= planeYmin && obstYmax <= planeYmax))) {
+                    return true;
+                }
             }
-        }
 
         return false;
     }
 
-    // void print() {
-    //     printf("X: %f %f\n", boundingBox[0].x, boundingBox[7].x);
-    //     printf("Y: %f %f\n", boundingBox[0].y, boundingBox[7].y);
-    //     printf("Z: %f %f\n", boundingBox[0].z, boundingBox[7].z);
-    // }
+    virtual int handleCollision() {
+        return -1;
+    }
 };
 
 class Block : public Obstacle {
@@ -132,11 +140,13 @@ public:
     Block(Model *block, const char *pathToTexture) : Obstacle(block, pathToTexture, 8, -4, 4) {
         aspect = glm::vec3(0.25f);
         direction = glm::vec3(-3.0, 0.0, 0.0);
-        collisionBias = 0.2;
+        collisionBiasX = 0.2;
+        collisionBiasY = 0.0;
         modelMat = scale(obstacle->boundingBox, modelMat, aspect);
         modelMat = translate(obstacle->boundingBox, modelMat, glm::vec3(12.0, 0.0, 0.0f), aspect);
     }
 
+private:
     void Draw(Shader shader, glm::mat4 model) {
         shader.setMat4("model", model);
         obstacle->Draw(shader);
@@ -148,6 +158,8 @@ public:
     Fence(Model *fence, const char *pathToTexture) : Obstacle(fence, pathToTexture, 8, -4.5, 3.5) {
         aspect = glm::vec3(0.04f, 0.25f, 0.25f);
         direction = glm::vec3(0.0, 0.0, -2.0);
+        collisionBiasX = 0.25;
+        collisionBiasY = 0.05;
         modelMat = rotate(modelMat, 90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
         modelMat = scale(obstacle->boundingBox, modelMat, aspect);
         modelMat = translate(obstacle->boundingBox, modelMat, glm::vec3(0.0, 0.0, 12.0), aspect);
@@ -160,6 +172,43 @@ public:
         shader.setMat4("model", frontMat);
         obstacle->Draw(shader);
     }
+
+    bool collision(glm::vec3 *boundingBox, Plane *plane, float offsetY) {
+        if(plane->isTurned()) {
+            return false;
+        }
+        glm::vec3 planeBB[8];
+        copyBoundingBox(planeBB, plane->getBoundingBox());
+
+        float biasX = collisionBiasX, biasY = collisionBiasY;
+
+        if(plane->isShrunk()) {
+            biasX /= 2;
+            biasY /= 2;
+        }
+        updateBoundingBoxX(planeBB, planeBB[0].x - biasX, planeBB[7].x + biasX);
+        updateBoundingBoxY(planeBB, planeBB[0].y - biasY, planeBB[7].y + biasY);
+
+        // if(obstacle->boundingBox[0].x > planeBB[7].x || obstacle->boundingBox[7].x < planeBB[0].x)
+        //     return false;
+        float obstXmin = boundingBox[0].z, obstXmax = boundingBox[7].z,
+              obstYmin = boundingBox[0].x + offsetY, obstYmax = boundingBox[7].x + offsetY + 0.15,
+              planeXmin = planeBB[0].x, planeXmax = planeBB[7].x,
+              planeYmin = planeBB[0].y, planeYmax = planeBB[7].y;
+
+            // printf("X %f %f\n", planeXmin, obstXmin);
+            // printf("Y %f %f\n\n", planeYmin, obstYmin);
+
+            if(((planeXmin >= obstXmin && planeXmin <= obstXmax) || (planeXmax >= obstXmin && planeXmax <= obstXmax))
+            || ((obstXmin >= planeXmin && obstXmin <= planeXmax) || (obstXmax >= planeXmin && obstXmax <= planeXmax))) {
+                if(((planeYmin >= obstYmin && planeYmin <= obstYmax) || (planeYmax >= obstYmin && planeYmax <= obstYmax))
+                || ((obstYmin >= planeYmin && obstYmin <= planeYmax) || (obstYmax >= planeYmin && obstYmax <= planeYmax))) {
+                    return true;
+                }
+            }
+
+        return false;
+    }
 };
 
 class Shrinker : public Obstacle {
@@ -167,7 +216,8 @@ public:
     Shrinker(Model *wrench, const char *pathToTexture) : Obstacle(wrench, pathToTexture, 8, -13.5, 13.5) {
         aspect = glm::vec3(0.075f);
         direction = glm::vec3(-6.5, 0.0, 0.0);
-        collisionBias = 0.35;
+        collisionBiasX = 0.35;
+        collisionBiasY = 0.15;
         modelMat = scale(obstacle->boundingBox, modelMat, aspect);
         modelMat = translate(obstacle->boundingBox, modelMat, glm::vec3(40.0, 0.0, 0.0), aspect);
     }
@@ -177,5 +227,9 @@ public:
         model = rotate(model, 10.0f, glm::vec3(0.0, 1.0, 0.0));
         shader.setMat4("model", model);
         obstacle->Draw(shader);
+    }
+
+    int handleCollision() {
+        return 2;
     }
 };

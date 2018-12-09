@@ -61,7 +61,7 @@ int main()
         glActiveTexture(GL_TEXTURE0);
 
         int points = renderScene(*shader, lightColor, lightPos, deltaTime);
-        if(points != 0) {
+        if(points > 0) {
             score += points;
             printf("Score: %d\n",score);
         }
