@@ -49,23 +49,23 @@ public:
     }
 
     void updateBoundingBoxX(float Xmin, float Xmax) {
-        for(int i = 0; i < 4; ++i)
+        for(int i = 0; i < 4;++i)
             boundingBox[i].x = Xmin;
-        for(int i = 4; i < 8; ++i)
+        for(int i = 4; i < 8;++i)
             boundingBox[i].x = Xmax;
     }
 
     void updateBoundingBoxY(float Ymin, float Ymax) {
         float y = Ymin;
-        for(int i = 0; i < 8; i += 2) {
-            for(int j = 0; j < 2; ++j)
-                boundingBox[i + j].y = y;
+        for(int i = 0; i < 8; i+= 2) {
+            for(int j = 0; j < 2;++j)
+                boundingBox[i+ j].y = y;
             y = y == Ymin ? Ymax : Ymin;
         }
     }
 
     void updateBoundingBoxZ(float Zmin, float Zmax) {
-        for(int i = 0; i < 8; ++i)
+        for(int i = 0; i < 8;++i)
             boundingBox[i].z = i % 2 == 0 ? Zmin : Zmax;
     }
 
@@ -102,7 +102,7 @@ private:
         // process each mesh located at the current node
         for(unsigned int i = 0; i < node->mNumMeshes; i++)
         {
-            // the node object only contains indices to index the actual objects in the scene. 
+            // the node object only contains indices to index the actual objects in the scene.
             // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             meshes.push_back(processMesh(mesh, scene));
@@ -283,7 +283,7 @@ private:
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma)
 {
     string filename = string(path);
-    filename = directory + '/' + filename;
+    filename = directory+ '/'+ filename;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);

@@ -18,7 +18,7 @@
 // lighting info
 // -------------
 glm::vec3 lightPos(-1.0, 1.0, 2.0);
-glm::vec3 lightColor(0.7);
+glm::vec3 lightColor(1.0);
 
 int main()
 {
@@ -26,6 +26,8 @@ int main()
         return -1;
 
     srand(time(NULL));
+
+    int score = 0;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -58,8 +60,11 @@ int main()
         shader->setVec3("lightColor", lightColor);
         glActiveTexture(GL_TEXTURE0);
 
-        renderScene(*shader, lightColor, lightPos, deltaTime);
-
+        int points = renderScene(*shader, lightColor, lightPos, deltaTime);
+        if(points != 0) {
+            score += points;
+            printf("Score: %d\n",score);
+        }
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
