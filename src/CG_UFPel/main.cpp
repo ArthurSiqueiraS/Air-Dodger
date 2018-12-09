@@ -25,6 +25,7 @@ int main()
     if(glSetup() == -1)
         return -1;
 
+    srand(time(NULL));
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -34,7 +35,7 @@ int main()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
+        timer += deltaTime;
         // input
         // -----
         processInput(window);
@@ -57,7 +58,15 @@ int main()
         shader->setVec3("lightPos", lightPos);
         shader->setVec3("lightColor", lightColor);
         glActiveTexture(GL_TEXTURE0);
-        renderScene(*shader, lightColor, lightPos);
+
+        bool sendWave;
+        if(timer > 2.0) {
+            sendWave = true;
+            timer = 0.0;
+        }
+        else
+            sendWave = false;
+        renderScene(*shader, lightColor, lightPos, sendWave, deltaTime);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
