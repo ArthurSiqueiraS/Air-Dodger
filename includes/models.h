@@ -42,10 +42,10 @@ void render(const Shader &shader, Model obj, glm::mat4 model) {
 int renderScene(Shader &shader, glm::vec3 lightColor, glm::vec3 lightPos, float deltaTime)
 {
     int score;
+    score = block->renderWave(shader, deltaTime, plane);
+    // fence->renderWave(shadcder, deltaTime, plane);
+    // shrinker->renderWave(shader, deltaTime, plane);
     plane->Draw(shader);
-    // score = block->renderWave(shader, deltaTime, plane);
-    // fence->renderWave(shader, deltaTime, plane);
-    shrinker->renderWave(shader, deltaTime, plane);
     skyMat = glm::rotate(skyMat, glm::radians(deltaTime * 5.0f), glm::vec3(0.0, 0.0, 1.0));
     shader.setVec3("lightPos", glm::vec3(0.0, 0.0, -500.0));
     render(shader, *sky, skyMat);

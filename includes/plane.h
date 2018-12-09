@@ -4,7 +4,7 @@ class Plane {
 private:
     Model *plane;
     glm::mat4 planeMat;
-    glm::vec3 *boundingBox;
+    glm::vec3 *boundingBox, *normalized;
     float vLimit;
     float hLimit;
     float aspect;
@@ -19,7 +19,6 @@ private:
 public:
     Plane() {
         plane = new Model(FileSystem::getPath("resources/objects/airplane/airplane.obj"));
-        print();
         // Ortho limits
         // vLimit = 0.90;
         // hLimit = SCR_WIDTH/SCR_HEIGHT - 0.1;
@@ -36,18 +35,18 @@ public:
 
         boundingBox = (glm::vec3 *) malloc(sizeof(glm::vec3) * 8);
         copyBoundingBox(boundingBox, plane->boundingBox);
+        normalized = (glm::vec3 *) malloc(sizeof(glm::vec3) * 8);
     }
 
     void print() {
         printf("Plane:\n");
-        printf("X: %f %f\n", boundingBox[0].x, boundingBox[7].x);
-        printf("Y: %f %f\n", boundingBox[0].y, boundingBox[7].y);
-        printf("Z: %f %f\n", boundingBox[0].z, boundingBox[7].z);
+        printf("X: %f %f\n", normalized[0].x, normalized[7].x);
+        printf("Y: %f %f\n", normalized[0].y, normalized[7].y);
+        printf("Z: %f %f\n", normalized[0].z, normalized[7].z);
     }
 
     void Draw(Shader shader) {
-        shader.setMat4("model", normalizePlaneMat());
-        print();
+        shader.setMat4("model", normalize());
         plane->Draw(shader);
     }
 
@@ -64,29 +63,30 @@ public:
             y = vLimit - planeMat[3][1];
 
         transform = glm::vec3(x, y, z);
-        planeMat = translate(boundingBox, planeMat, transform);
+        planeMat = glm::translate(planeMat, transform);
+        translate(boundingBox, planeMat, transform/scaleVec);
     }
 
     void turn(float degrees) {
         if(angle < 90.0f) {
             angle = glm::min(angle + degrees * turnSpeed, 90.0f);
-            float currentYmin = plane->boundingBox[0].y, currentYmax = plane->boundingBox[7].y,
-                currentZmin = plane->boundingBox[0].z, currentZmax = plane->boundingBox[7].z,
+            float currentYmin = boundingBox[0].y, currentYmax = boundingBox[7].y,
+                currentZmin = boundingBox[0].z, currentZmax = boundingBox[7].z,
                 offset = degrees;
-            plane->updateBoundingBoxY(currentYmin - offset, currentYmax + offset);
-            plane->updateBoundingBoxZ(currentZmin + offset, currentZmax - offset);
+            updateBoundingBoxY(boundingBox, currentYmin - offset, currentYmax + offset);
+            updateBoundingBoxZ(boundingBox, currentZmin + offset, currentZmax - offset);
         }
     }
 
     void unturn(float degrees) {
         if(angle > 0.0f) {
             angle = glm::max(angle - degrees * turnSpeed, 0.0f);
-            float currentYmin = plane->boundingBox[0].y, currentYmax = plane->boundingBox[7].y,
-                currentZmin = plane->boundingBox[0].z, currentZmax = plane->boundingBox[7].z,
+            float currentYmin = boundingBox[0].y, currentYmax = boundingBox[7].y,
+                currentZmin = boundingBox[0].z, currentZmax = boundingBox[7].z,
                 offset = degrees;
 
-            plane->updateBoundingBoxY(currentYmin + offset, currentYmax - offset);
-            plane->updateBoundingBoxZ(currentZmin - offset, currentZmax + offset);
+            updateBoundingBoxY(boundingBox, currentYmin + offset, currentYmax - offset);
+            updateBoundingBoxZ(boundingBox, currentZmin - offset, currentZmax + offset);
         }
     }
 
@@ -100,26 +100,27 @@ public:
             aspect = glm::min(aspect + dec * resizeSpeed, size);
     }
 
-    glm::vec3 *boundingBox() {
-        glm::vec3 backUpBoundingBox[8], *normalized = (glm::vec3 *) malloc(sizeof(glm::vec3) * 8);
-        copyBoundingBox(backUpBoundingBox, plane->boundingBox);
-        normalizePlaneMat();
-        copyBoundingBox(normalized, plane->boundingBox);
-        copyBoundingBox(plane->boundingBox, backUpBoundingBox);
+    glm::vec3 *getBoundingBox() {
+        normalize();
         return normalized;
     }
 
 private:
-    glm::mat4 normalizePlaneMat() {
+    glm::mat4 normalize() {
+        copyBoundingBox(normalized, boundingBox);
+        return normalizePlaneMat(normalized);
+    }
+
+    glm::mat4 normalizePlaneMat(glm::vec3 *boundingBox) {
         scaleVec = glm::vec3(aspect * 1.75, aspect, aspect);
-        glm::mat4 renderMat = scale(plane->boundingBox, planeMat, scaleVec);
+        glm::mat4 renderMat = scale(boundingBox, planeMat, scaleVec);
         // Normalize plane angle
         renderMat = rotate(renderMat, 180.0f, glm::vec3(0.0, 1.0, 0.0));
         renderMat = rotate(renderMat, 15.0f, glm::vec3(0.0, 0.0, 1.0));
         renderMat = rotate(renderMat, 90.0f, glm::vec3(-1.0, 0.0, 0.0));
         // Turn movement animations
         // print();
-        renderMat = translate(plane->boundingBox, renderMat, glm::vec3(angle/90, 0.0, angle/22.5));
+        renderMat = translate(boundingBox, renderMat, glm::vec3(angle/90, 0.0, angle/22.5), scaleVec);
         // print();
         renderMat = rotate(renderMat, angle, glm::vec3(-1.0, 0.0, 0.0));
         renderMat = rotate(renderMat, angle/6, glm::vec3(0.0, 0.0, 1.0));

@@ -15,10 +15,9 @@ protected:
     int maxPositions;
     float *validY;
     queue<Wave> waves;
-    float frequency, timer;
+    float frequency, timer, collisionBias;
     glm::vec3 aspect;
     glm::vec3 direction;
-    glm::vec3 *boundingBox;
 
 public:
     Obstacle(Model *model, const char *pathToTexture, int positions, float minY, float maxY) {
@@ -32,8 +31,6 @@ public:
             validY[i] = minY + i * rangeY/(maxPositions - 1);
         timer = 1.5;
         frequency = 3.0;
-        boundingBox = (glm::vec3 *) malloc(sizeof(glm::vec3) * 8);
-        copyBoundingBox(boundingBox, plane->boundingBox);
     }
 
     int renderWave(Shader shader, float deltaTime, Plane *plane) {
@@ -56,7 +53,7 @@ public:
                 glm::vec3 backUpBoundingBox[8];
                 wave.mats[i] = glm::translate(wave.mats[i], direction * deltaTime);
                 Draw(shader, wave.mats[i]);
-                checkCollision(plane);
+                collision(wave.boundingBox, plane);
             }
             translate(wave.boundingBox, wave.mats[0], direction * deltaTime, aspect);
         }
@@ -98,39 +95,44 @@ public:
             copy[i] = original[i];
     }
 
-    bool checkCollision(Plane *plane) {
-        glm::vec3 *planeBB = plane->boundingBox();
+    bool collision(glm::vec3 *boundingBox, Plane *plane) {
+        glm::vec3 planeBB[8];
+        copyBoundingBox(planeBB, plane->getBoundingBox());
+        updateBoundingBoxX(planeBB, planeBB[0].x - collisionBias, planeBB[7].x + collisionBias);
+
         // if(obstacle->boundingBox[0].x > planeBB[7].x || obstacle->boundingBox[7].x < planeBB[0].x)
         //     return false;
-
-        float Xmin = obstacle->boundingBox[0].x, Xmax = obstacle->boundingBox[7].x,
-              Ymin = obstacle->boundingBox[0].y, Ymax = obstacle->boundingBox[7].y,
-              Zmin = obstacle->boundingBox[0].z, Zmax = obstacle->boundingBox[7].z;
+        float obstXmin = boundingBox[0].x, obstXmax = boundingBox[7].x,
+              planeXmin = planeBB[0].x, planeXmax = planeBB[7].x;
 
         for(int i = 0; i < 8; ++i) {
-            float X = planeBB[i].x, Y = planeBB[i].y, Z = planeBB[i].z;
+            float planeX = planeBB[i].x,
+                  obstX = boundingBox[i].x;
             if(
-                X > Xmin && X < Xmax &&
-                Y > Ymin && Y < Ymax
-            )
-                printf("hit\n"); break;
+                (planeX >= obstXmin && planeX <= obstXmax) ||
+                (obstX >= planeXmin && obstX <= planeXmax)
+            ) {
+                printf("hit [%d]\n", i);
+                return true;
+            }
         }
 
-        free(planeBB);
+        return false;
     }
 
-    void print() {
-        printf("X: %f %f\n", obstacle->boundingBox[0].x, obstacle->boundingBox[7].x);
-        printf("Y: %f %f\n", obstacle->boundingBox[0].y, obstacle->boundingBox[7].y);
-        printf("Z: %f %f\n", obstacle->boundingBox[0].z, obstacle->boundingBox[7].z);
-    }
+    // void print() {
+    //     printf("X: %f %f\n", boundingBox[0].x, boundingBox[7].x);
+    //     printf("Y: %f %f\n", boundingBox[0].y, boundingBox[7].y);
+    //     printf("Z: %f %f\n", boundingBox[0].z, boundingBox[7].z);
+    // }
 };
 
 class Block : public Obstacle {
 public:
     Block(Model *block, const char *pathToTexture) : Obstacle(block, pathToTexture, 8, -4, 4) {
         aspect = glm::vec3(0.25f);
-        direction = glm::vec3(-2.0, 0.0, 0.0);
+        direction = glm::vec3(-3.0, 0.0, 0.0);
+        collisionBias = 0.2;
         modelMat = scale(obstacle->boundingBox, modelMat, aspect);
         modelMat = translate(obstacle->boundingBox, modelMat, glm::vec3(12.0, 0.0, 0.0f), aspect);
     }
@@ -165,10 +167,9 @@ public:
     Shrinker(Model *wrench, const char *pathToTexture) : Obstacle(wrench, pathToTexture, 8, -13.5, 13.5) {
         aspect = glm::vec3(0.075f);
         direction = glm::vec3(-6.5, 0.0, 0.0);
+        collisionBias = 0.35;
         modelMat = scale(obstacle->boundingBox, modelMat, aspect);
         modelMat = translate(obstacle->boundingBox, modelMat, glm::vec3(40.0, 0.0, 0.0), aspect);
-        float currentYmin = obstacle->boundingBox[0].y, currentYmax = obstacle->boundingBox[7].y;
-        obstacle->updateBoundingBoxY(currentYmin, currentYmax);
     }
 
     void Draw(Shader shader, glm::mat4 model) {
