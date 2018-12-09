@@ -29,14 +29,10 @@ void render(const Shader &shader, Model obj, glm::mat4 model) {
 
 // renders the 3D scene
 // --------------------
-void renderScene(const Shader &shader, glm::vec3 lightColor, glm::vec3 lightPos, bool sendWave, float deltaTime)
+void renderScene(const Shader &shader, glm::vec3 lightColor, glm::vec3 lightPos, float deltaTime)
 {
     // fence->Draw(shader);
     plane->Draw(shader);
-    if(sendWave) {
-        block->queueWave(shader);
-        fence->queueWave(shader);
-    }
-    block->Draw(shader, deltaTime);
-    fence->Draw(shader, deltaTime);
+    block->renderWave(shader, deltaTime);
+    // fence->renderWave(shader, deltaTime);
 }

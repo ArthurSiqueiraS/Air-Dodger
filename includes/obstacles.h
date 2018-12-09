@@ -10,6 +10,7 @@ protected:
     int maxPositions;
     float *validY;
     queue<glm::mat4 *> waves;
+    float frequency, timer;
     glm::vec3 direction;
 
 public:
@@ -22,20 +23,71 @@ public:
         validY = (float *) malloc(sizeof(float) * maxPositions);
         for(int i = 0; i < maxPositions; ++i)
             validY[i] = minY + i * rangeY/(maxPositions - 1);
+        timer = 1.5;
+        frequency = 3.0;
     }
 
+    void renderWave(Shader shader, float deltaTime) {
+        timer += deltaTime;
+        if(timer >= frequency) {
+            queueWave(shader);
+            timer = 0.0;
+        }
+
+        glBindTexture(GL_TEXTURE_2D, texture);
+        queue<glm::mat4 *> waveCycle;
+        while(!waves.empty()) {
+            waveCycle.push(waves.front());
+            waves.pop();
+            glm::mat4 *waveMats = (glm::mat4 *) waveCycle.back();
+            for(int i = 0; i < maxPositions; ++i) {
+                glm::vec3 backUpBoundingBox[8];
+                copyBoundingBox(backUpBoundingBox, obstacle->boundingBox);
+                waveMats[i] = translate(obstacle, waveMats[i], direction * deltaTime);
+                float offsetY = waveMats[i][3][1] - modelMat[3][1],
+                      currYmin = obstacle->boundingBox[0].y, currYmax = obstacle->boundingBox[7].y;
+                obstacle->updateBoundingBoxY(currYmin + offsetY, currYmax + offsetY);
+                Draw(shader, waveMats[i]);
+                if(frequency > 2.9) {
+                    printf("[%d]\n", i);
+                    print();
+                }
+                copyBoundingBox(obstacle->boundingBox, backUpBoundingBox);
+            }
+        }
+
+        while(!waveCycle.empty()) {
+            glm::mat4 * wave = waveCycle.front();
+            if(wave[0][3][0] > -3)
+                waves.push(wave);
+            else
+                free(wave);
+            waveCycle.pop();
+        }
+    }
+
+    virtual void Draw(Shader shader, glm::mat4 model) = 0;
+
     void queueWave(Shader shader) {
-        direction *= 1.1;
+        if(direction.x > -19.0 && direction.z > -19.0)
+            direction *= 1.1;
+        if(frequency > 0.51)
+            frequency -= 0.1;
+
         glm::mat4 *waveMats = (glm::mat4 *) malloc(sizeof(glm::mat4) * maxPositions);
 
         for(int i = 0; i < maxPositions; ++i)
-            waveMats[i] = translate(obstacle, modelMat, glm::vec3(0.0, validY[i], 0.0));
+            waveMats[i] = glm::translate(modelMat, glm::vec3(0.0, validY[i], 0.0));
 
         waves.push(waveMats);
     }
 
+    void copyBoundingBox(glm::vec3 *copy, glm::vec3 *original) {
+        for(int i = 0; i < 8; ++i)
+            copy[i] = original[i];
+    }
+
     void print() {
-        printf("Block:\n");
         printf("X: %f %f\n", obstacle->boundingBox[0].x, obstacle->boundingBox[7].x);
         printf("Y: %f %f\n", obstacle->boundingBox[0].y, obstacle->boundingBox[7].y);
         printf("Z: %f %f\n", obstacle->boundingBox[0].z, obstacle->boundingBox[7].z);
@@ -50,28 +102,9 @@ public:
         modelMat = scale(obstacle, modelMat, glm::vec3(0.25f));
     }
 
-    void Draw(Shader shader, float deltaTime) {
-        glBindTexture(GL_TEXTURE_2D, texture);
-        queue<glm::mat4 *> waveCycle;
-        while(!waves.empty()) {
-            waveCycle.push(waves.front());
-            waves.pop();
-            glm::mat4 *waveMats = (glm::mat4 *) waveCycle.back();
-            printf("%f\n", waveMats[0][3][0]);
-            for(int i = 0; i < maxPositions; ++i) {
-                waveMats[i] = translate(obstacle, waveMats[i], direction * deltaTime);
-                shader.setMat4("model", waveMats[i]);
-                obstacle->Draw(shader);
-            }
-        }
-        while(!waveCycle.empty()) {
-            glm::mat4 * wave = waveCycle.front();
-            if(wave[0][3][0] > -3)
-                waves.push(wave);
-            else
-                free(wave);
-            waveCycle.pop();
-        }
+    void Draw(Shader shader, glm::mat4 model) {
+        shader.setMat4("model", model);
+        obstacle->Draw(shader);
     }
 };
 
@@ -84,29 +117,11 @@ public:
         modelMat = scale(obstacle, modelMat, glm::vec3(0.04f, 0.25f, 0.25f));
     }
 
-    void Draw(Shader shader, float deltaTime) {
-        glBindTexture(GL_TEXTURE_2D, texture);
-        queue<glm::mat4 *> waveCycle;
-        while(!waves.empty()) {
-            waveCycle.push(waves.front());
-            waves.pop();
-            glm::mat4 *waveMats = (glm::mat4 *) waveCycle.back();
-            for(int i = 0; i < maxPositions; ++i) {
-                waveMats[i] = translate(obstacle, waveMats[i], direction * deltaTime);
-                shader.setMat4("model", waveMats[i]);
-                obstacle->Draw(shader);
-                glm::mat4 frontMat = glm::translate(waveMats[i], glm::vec3(-3.0, 0.0, 0.0));
-                shader.setMat4("model", frontMat);
-                obstacle->Draw(shader);
-            }
-        }
-        while(!waveCycle.empty()) {
-            glm::mat4 * wave = waveCycle.front();
-            if(wave[0][3][0] > - 3)
-                waves.push(wave);
-            else
-                free(wave);
-            waveCycle.pop();
-        }
+    void Draw(Shader shader, glm::mat4 model) {
+        shader.setMat4("model", model);
+        obstacle->Draw(shader);
+        glm::mat4 frontMat = glm::translate(model, glm::vec3(-3.0, 0.0, 0.0));
+        shader.setMat4("model", frontMat);
+        obstacle->Draw(shader);
     }
 };

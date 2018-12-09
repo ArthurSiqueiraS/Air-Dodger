@@ -10,7 +10,6 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-float timer = 1.0;
 
 bool UPpress = false;
 bool DOWNpress = false;
