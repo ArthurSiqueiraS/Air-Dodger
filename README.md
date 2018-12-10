@@ -1,18 +1,26 @@
 ## Controls
 
 ### Keyboard
-   Up Arrow:    Move plane up
- Left Arrow:    Move plane left
+Up Arrow:    Move plane up
+
+Left Arrow:    Move plane left
+
 Right Arrow:    Move plane right
- Down Arrow:    Move plane down
-          Q:    Turn plane 90º
+
+Down Arrow:    Move plane down
+
+Q:    Turn plane 90º
 
 ### Joystick (Dualshock)
-   Triangle:    Move plane up
-     Square:    Move plane left
-     Circle:    Move plane right
-      Cross:    Move plane down
-         L1:    Turn plane 90º
+Triangle:    Move plane up
+
+Square:    Move plane left
+
+Circle:    Move plane right
+
+Cross:    Move plane down
+
+L1:    Turn plane 90º
 
 ## Objective
 The game only ends when the plane hits an obstacle. You gain 150 score points for every wave survived, but they also get faster on each wave.
