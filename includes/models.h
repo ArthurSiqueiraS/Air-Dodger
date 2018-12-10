@@ -14,6 +14,7 @@ Model *cube, *openCube, *wrench, *sky;
 glm::mat4 skyMat;
 bool shrink;
 float shrinkTimer;
+int shrinkBounces;
 
 void loadModels() {
 	plane = new Plane();
@@ -36,6 +37,7 @@ void loadModels() {
 
     shrink = false;
     shrinkTimer = 5.0;
+    shrinkBounces = 0;
 }
 
 void render(const Shader &shader, Model obj, glm::mat4 model) {
@@ -48,33 +50,45 @@ void render(const Shader &shader, Model obj, glm::mat4 model) {
 int renderScene(Shader &shader, glm::vec3 lightColor, glm::vec3 lightPos, float deltaTime)
 {
     int score = 150, ev;
-    bool endGame = false;
-    // ev = block->renderWave(shader, deltaTime, plane);
-    // endGame = ev == -1 ? true : false;
-    ev = fence->renderWave(shader, deltaTime, plane);
-    endGame = endGame || ev == -1 ? true : false;
-    score *= ev;
+    bool endGame = false, availablePositions[8] = { true, true, true, true, true, true, true, true };
+    ev = fence->renderWave(shader, deltaTime, plane, availablePositions);
+    endGame = ev == -1;
+    ev = block->renderWave(shader, deltaTime, plane, availablePositions);
+    endGame = endGame || ev == -1;
+    if(endGame)
+        score *= -1;
+    else
+        score *= ev;
 
     plane->Draw(shader);
-    // if(!shrink) {
-    //     ev = shrinker->renderWave(shader, deltaTime, plane);
-    //     if(ev == 2) {
-    //         shrink = true;
-    //         shrinkTimer = 5.0;
-    //         score += 50;
-    //     }
-    //     if(shrinkTimer < 5.0) {
-    //         plane->deShrink(deltaTime * 0.01);
-    //         shrinkTimer = min(shrinkTimer + deltaTime, 5.0f);
-    //     }
-    // }
-    // else {
-    //     plane->shrink(deltaTime * 0.01);
-    //     shrinkTimer = max(shrinkTimer - deltaTime, 0.0f);
-    //     if(shrinkTimer <= 0.0) {
-    //         shrink = false;
-    //     }
-    // }
+
+    if(!shrink) {
+        if(shrinkBounces > 0 && shrinkTimer > 0.1)
+            shrink = true;
+        else if (shrinkBounces == 0) {
+            ev = shrinker->renderWave(shader, deltaTime, plane, availablePositions);
+            if(ev == 2) {
+                shrink = true;
+                shrinkTimer = 5.0;
+                score += 100;
+            }
+        }
+        if(shrinkTimer < 5.0) {
+            plane->deShrink(deltaTime * 0.01);
+            shrinkTimer = min(shrinkTimer + deltaTime, 5.0f);
+        }
+    }
+    else {
+        plane->shrink(deltaTime * 0.01);
+        shrinkTimer = max(shrinkTimer - deltaTime, 0.0f);
+        if(shrinkTimer <= 0.0) {
+            shrink = false;
+            if(shrinkBounces == 0)
+                shrinkBounces = 5;
+            else
+                --shrinkBounces;
+        }
+    }
     skyMat = glm::rotate(skyMat, glm::radians(deltaTime * 1.5f), glm::vec3(0.0, 0.0, 1.0));
     shader.setVec3("lightPos", glm::vec3(0.0, 0.0, -500.0));
     render(shader, *sky, skyMat);

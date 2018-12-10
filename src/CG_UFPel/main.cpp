@@ -65,6 +65,10 @@ int main()
             score += points;
             printf("Score: %d\n",score);
         }
+        else if(points < 0) {
+            printf("GAME OVER\n");
+            break;
+        }
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);

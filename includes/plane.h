@@ -64,7 +64,7 @@ public:
     }
 
     bool isTurned() {
-        return turned;
+        return angle > 60.0f;
     }
 
     void turn(float degrees) {
@@ -76,8 +76,6 @@ public:
             updateBoundingBoxY(boundingBox, currentYmin - bias, currentYmax + bias);
             updateBoundingBoxZ(boundingBox, currentZmin + bias, currentZmax - bias);
         }
-        else
-            turned = true;
     }
 
     void unturn(float degrees) {
@@ -90,26 +88,20 @@ public:
             updateBoundingBoxY(boundingBox, currentYmin + bias, currentYmax - bias);
             updateBoundingBoxZ(boundingBox, currentZmin - bias, currentZmax + bias);
         }
-        else
-            turned = false;
     }
 
     bool isShrunk() {
-        return shrunk;
+        return aspect < size * 0.7;
     }
 
     void shrink(float dec) {
         if(aspect > shrinkSize)
             aspect = glm::max(aspect - dec * resizeSpeed, shrinkSize);
-        else
-            shrunk = true;
     }
 
     void deShrink(float dec) {
         if(aspect < size)
             aspect = glm::min(aspect + dec * resizeSpeed, size);
-        else
-            shrunk = false;
     }
 
     glm::vec3 *getBoundingBox() {
