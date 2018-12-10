@@ -36,4 +36,4 @@ Avoid by flying above or beneath or turn your plane to go right through it.
 ## Items
 
 ### Wonder Wrench
-Pick up the magical wrenches between the blocks to temporarily shrink your plane so it can pass through empty spaces more easily.
+Pick up the magical wrenches between the blocks to gain an extra 100 score points and temporarily shrink your plane so it can pass through empty spaces more easily.
