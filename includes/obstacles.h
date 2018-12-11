@@ -161,6 +161,7 @@ public:
         modelMat = scale(obstacle->boundingBox, modelMat, aspect);
         modelMat = translate(obstacle->boundingBox, modelMat, glm::vec3(12.0, 0.0, 0.0f), aspect);
         maxSelf = 7;
+        P = 6;
     }
 
 private:
@@ -181,6 +182,7 @@ public:
         modelMat = scale(obstacle->boundingBox, modelMat, aspect);
         modelMat = translate(obstacle->boundingBox, modelMat, glm::vec3(0.0, 0.0, 12.0), aspect);
         maxSelf = 8;
+        P = 2;
     }
 
 private:
@@ -219,7 +221,7 @@ private:
                 else {
                     wave.chance[i + 1] = 8;
                 }
-                if(wave.chance[i + 1] < P) {
+                if(wave.chance[i + 1] < P * 3) {
                     ++qt;
                 }
             }

@@ -91,7 +91,7 @@ public:
     }
 
     bool isShrunk() {
-        return aspect < size * 0.7;
+        return aspect < size * 0.9;
     }
 
     void shrink(float dec) {
